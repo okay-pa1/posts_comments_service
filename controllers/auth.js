@@ -6,6 +6,11 @@ import { logUserActivity } from "./userActivity.js";
 export const register = async (req, res) => {
   try {
     const { username, password } = req.body;
+
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(409).json({ message: "Username already taken." });
+    }
     const hashedPassword = bcrypt.hashSync(password, 10);
 
     const user = new User({
@@ -13,9 +18,9 @@ export const register = async (req, res) => {
       password: hashedPassword,
     });
     await user.save();
-    res.status(200).send("User created successfully");
+    res.status(201).send("User created successfully");
   } catch (err) {
-    res.send(err);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -25,13 +30,13 @@ export const login = async (req, res) => {
     const user = await User.findOne({ username });
 
     //if user didn't exist
-    if (!user) res.status(404).send("User not found");
+    if (!user) return res.status(404).send("User not found");
 
     //to check if the provided password is correct
     const isPwdCorrect = await bcrypt.compare(password, user.password);
 
     //if password is incorrect
-    if (!isPwdCorrect) res.status(400).send("Incorrect password");
+    if (!isPwdCorrect) return res.status(401).send("Incorrect password");
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "4h",
@@ -46,6 +51,6 @@ export const login = async (req, res) => {
 
     res.status(200).json({ message: "Succesful Login", token });
   } catch (err) {
-    res.send(err);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
