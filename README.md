@@ -141,10 +141,10 @@ Authorization: Bearer <JWT_TOKEN>
 
 ### 🔐 Auth Routes
 
-| Method | Endpoint             | Description          |
-| ------ | -------------------- | -------------------- |
-| POST   | `/api/auth/register` | Register a new user  |
-| POST   | `/api/auth/login`    | Login and return JWT |
+| Method | Endpoint         | Description          |
+| ------ | ---------------- | -------------------- |
+| POST   | `/auth/register` | Register a new user  |
+| POST   | `/auth/login`    | Login and return JWT |
 
 **🧾 Sample Request:**
 
@@ -159,14 +159,14 @@ Authorization: Bearer <JWT_TOKEN>
 
 ### 📝 Post Routes
 
-| Method | Endpoint             | Description                       |
-| ------ | -------------------- | --------------------------------- |
-| POST   | `/api/posts`         | Create a new post (Auth required) |
-| GET    | `/api/posts`         | Get all posts (Paginated)         |
-| GET    | `/api/posts/user`    | Get all posts by logged-in user   |
-| GET    | `/api/posts/:postId` | Get a single post by ID           |
-| PUT    | `/api/posts/:postId` | Update a post                     |
-| DELETE | `/api/posts/:postId` | Delete a post                     |
+| Method | Endpoint         | Description                       |
+| ------ | ---------------- | --------------------------------- |
+| POST   | `/posts`         | Create a new post (Auth required) |
+| GET    | `/posts`         | Get all posts (Paginated)         |
+| GET    | `/posts/user`    | Get all posts by logged-in user   |
+| GET    | `/posts/:postId` | Get a single post by ID           |
+| PUT    | `/posts/:postId` | Update a post                     |
+| DELETE | `/posts/:postId` | Delete a post                     |
 
 **🧾 Sample Request (Create):**
 
@@ -181,14 +181,14 @@ Authorization: Bearer <JWT_TOKEN>
 
 ### 💬 Comment Routes
 
-| Method | Endpoint                      | Description                            |
-| ------ | ----------------------------- | -------------------------------------- |
-| POST   | `/api/comments/:postId`       | Add a Markdown-formatted comment       |
-| GET    | `/api/comments`               | Get all comments by logged-in user     |
-| GET    | `/api/comments/under/:postId` | Get all comments under a specific post |
-| GET    | `/api/comments/:commentId`    | Get a specific comment                 |
-| PUT    | `/api/comments/:commentId`    | Update a comment                       |
-| DELETE | `/api/comments/:commentId`    | Delete a comment                       |
+| Method | Endpoint                  | Description                            |
+| ------ | ------------------------- | -------------------------------------- |
+| POST   | `/comments/:postId`       | Add a Markdown-formatted comment       |
+| GET    | `/comments`               | Get all comments by logged-in user     |
+| GET    | `/comments/under/:postId` | Get all comments under a specific post |
+| GET    | `/comments/:commentId`    | Get a specific comment                 |
+| PUT    | `/comments/:commentId`    | Update a comment                       |
+| DELETE | `/comments/:commentId`    | Delete a comment                       |
 
 **🧾 Sample Request (Markdown):**
 
@@ -211,15 +211,15 @@ All GET routes that retrieve multiple items (like all posts or all comments) sup
 
 ### ✅ Supported in:
 
-- `GET /api/posts`
-- `GET /api/posts/user`
-- `GET /api/comments`
-- `GET /api/comments/under/:postId`
+- `GET /posts`
+- `GET /posts/user`
+- `GET /comments`
+- `GET /comments/under/:postId`
 
 **Example:**
 
 ```
-GET /api/posts?page=2&limit=5&sortBy=createdAt&order=desc
+GET /posts?page=2&limit=5&sortBy=createdAt&order=desc
 ```
 
 ---
