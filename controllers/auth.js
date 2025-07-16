@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import { logUserActivity } from "./userActivity.js";
 
 export const register = async (req, res) => {
   try {
@@ -35,6 +36,14 @@ export const login = async (req, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "4h",
     });
+
+    await logUserActivity({
+      userId: user._id,
+      action: "login",
+      collection: "User",
+      metadata: { userLoggedIn: req._id },
+    });
+
     res.status(200).json({ message: "Succesful Login", token });
   } catch (err) {
     res.send(err);
