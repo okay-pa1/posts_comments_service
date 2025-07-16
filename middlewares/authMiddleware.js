@@ -1,9 +1,13 @@
 import jwt from "jsonwebtoken";
 export const verifyToken = async (req, res, next) => {
-  const token = req.headers["authorization"];
-  if (!token) {
-    return res.status(401).json({ message: "User should be logged In first" });
+  const authHeader = req.headers["authorization"];
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res
+      .status(401)
+      .json({ message: "Authorization token is missing or incorrect" });
   }
+
+  const token = authHeader.split(" ")[1];
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {

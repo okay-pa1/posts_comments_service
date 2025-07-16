@@ -4,10 +4,10 @@ const Schema = mongoose.Schema;
 const commentSchema = new mongoose.Schema(
   {
     comment: {
-      type: Schema.Types.Mixed,
+      type: String,
       required: true,
     },
-    underThePost: {
+    postId: {
       type: Schema.Types.ObjectId,
       ref: "Posts",
       required: true,

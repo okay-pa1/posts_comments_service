@@ -36,16 +36,64 @@ export const getPost = async (req, res) => {
   }
 };
 
-export const getAllPosts = async (req, res) => {
+export const getAllUserPosts = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const sortBy = req.query.sortBy === "createdAt" ? "createdAt" : "createdAt";
+  const order = req.query.order === "asc" ? "1" : "-1";
   try {
     const allPosts = await Post.find({
       postedBy: req._id,
       isDeleted: false,
-    }).populate("postedBy", "username");
-    res.status(200).send(allPosts);
+    })
+      .populate("postedBy", "username")
+      .sort({ [sortBy]: order })
+      .skip((page - 1) * 10)
+      .limit(limit);
+
+    const total = await Post.countDocuments({
+      postedBy: req._id,
+      isDeleted: false,
+    });
+
+    res.status(200).json({
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      posts,
+    });
   } catch (err) {
     const status = err.status || 500;
     res.status(status).json({ message: err.message });
+  }
+};
+
+export const getAllPosts = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const sortBy = req.query.sortBy === "createdAt" ? "createdAt" : "createdAt";
+  const order = req.query.order === "asc" ? 1 : -1;
+
+  try {
+    const posts = await Post.find({ isDeleted: false })
+      .populate("postedBy", "username")
+      .sort({ [sortBy]: order })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const total = await Post.countDocuments({ isDeleted: false });
+
+    res.status(200).json({
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      posts,
+    });
+  } catch (err) {
+    const errStatus = err.status || 500;
+    res.status(errStatus).json({ message: err.message });
   }
 };
 

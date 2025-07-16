@@ -1,5 +1,4 @@
 import Comment from "../models/Comments.js";
-import Post from "../models/Posts.js";
 
 export const createComment = async (req, res) => {
   try {
@@ -35,14 +34,36 @@ export const getComment = async (req, res) => {
     res.status(errStatus).json({ message: err.message });
   }
 };
-export const getAllPostComments = async (req, res) => {
-  try {
-    const allPostComments = await Comment.find({
-      underThePost: req.params.postId,
-      isDeleted: false,
-    }).populate("title");
 
-    res.status(200).send(allPostComments);
+export const getAllPostComments = async (req, res) => {
+  const postId = req.params.postId;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const sortBy = req.query.sortBy || "createdAt";
+  const order = req.query.order === "asc" ? 1 : -1;
+
+  try {
+    const comments = await Comment.find({
+      underThePost: postId,
+      isDeleted: false,
+    })
+      .populate("underThePost", "title")
+      .sort({ [sortBy]: order })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const total = await Comment.countDocuments({
+      underThePost: postId,
+      isDeleted: false,
+    });
+
+    res.status(200).json({
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      comments,
+    });
   } catch (err) {
     const errStatus = err.status || 500;
     res.status(errStatus).json({ message: err.message });
@@ -50,37 +71,40 @@ export const getAllPostComments = async (req, res) => {
 };
 
 export const getAllUserComments = async (req, res) => {
+  const userId = req._id;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const sortBy = req.query.sortBy || "createdAt";
+  const order = req.query.order === "asc" ? 1 : -1;
+
   try {
-    const allUserComments = await Comment.find({
-      commentedBy: req._id,
+    const comments = await Comment.find({
+      commentedBy: userId,
       isDeleted: false,
-    }).populate("underThePost", "title description");
+    })
+      .populate("underThePost", "title description")
+      .sort({ [sortBy]: order })
+      .skip((page - 1) * limit)
+      .limit(limit);
 
-    res.status(200).send(allUserComments);
+    const total = await Comment.countDocuments({
+      commentedBy: userId,
+      isDeleted: false,
+    });
+
+    res.status(200).json({
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      comments,
+    });
   } catch (err) {
     const errStatus = err.status || 500;
     res.status(errStatus).json({ message: err.message });
   }
 };
-export const updateComment = async (req, res) => {
-  try {
-    const data = req.body;
 
-    const updatedComment = await Comment.findOneAndUpdate(
-      { _id: req.params.commentId, isDeleted: false },
-      data,
-      { new: true }
-    );
-
-    if (!updatedComment)
-      res.status(404).json({ message: "Comment doesn't exist" });
-
-    res.status(200).send(updatedComment);
-  } catch (err) {
-    const errStatus = err.status || 500;
-    res.status(errStatus).json({ message: err.message });
-  }
-};
 export const deleteComment = async (req, res) => {
   try {
     const deletedComment = await Comment.findOneAndUpdate(
